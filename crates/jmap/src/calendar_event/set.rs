@@ -317,9 +317,24 @@ impl CalendarEventSet for Server {
             new_calendar_event.data.event = ical;
             stamp_updated(&mut new_calendar_event.data.event, now() as i64);
 
-            // Assign an organizer when participants were added to an event that had none
-            if let Some(organizer_address) = account_info.addresses().first() {
-                itip_assign_organizer(&mut new_calendar_event.data.event, organizer_address);
+            // A new recurrence override can inherit attendees without an
+            // ORGANIZER property. Keep the series organizer on that override,
+            // including when this account is an invited attendee.
+            let organizer_address = new_calendar_event
+                .data
+                .event
+                .components
+                .iter()
+                .find_map(|component| {
+                    component
+                        .property(&ICalendarProperty::Organizer)
+                        .and_then(|entry| entry.values.first())
+                        .and_then(|value| value.as_text())
+                        .map(|address| address.trim_start_matches("mailto:").to_string())
+                })
+                .or_else(|| account_info.addresses().first().cloned());
+            if let Some(organizer_address) = organizer_address {
+                itip_assign_organizer(&mut new_calendar_event.data.event, &organizer_address);
             }
 
             // Validate UID

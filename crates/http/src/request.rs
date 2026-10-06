@@ -14,6 +14,7 @@ use crate::{
             registration::ClientRegistrationHandler, token::TokenHandler,
         },
     },
+    fog::route_request,
     form::FormHandler,
 };
 use common::{
@@ -81,9 +82,6 @@ impl ParseHttp for Server {
         mut req: HttpRequest,
         session: HttpSessionData,
     ) -> trc::Result<HttpResponse> {
-        let mut path = req.uri().path().split('/');
-        path.next();
-
         // Validate endpoint access
         let ctx = HttpContext::new(&session, &req);
         match ctx.has_endpoint_access(self).await {
@@ -96,7 +94,14 @@ impl ParseHttp for Server {
             }
         }
 
+        if let Some(response) = route_request(self, &mut req, &session).await? {
+            return Ok(response);
+        }
+
+        let mut path = req.uri().path().split('/');
+        path.next();
         match path.next().unwrap_or_default() {
+            "gmail" | "people" => {}
             "jmap" => {
                 match (path.next().unwrap_or_default(), req.method()) {
                     ("", &Method::POST) => {

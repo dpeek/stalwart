@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-SEL
  */
 
-use super::assert_is_unique_uid;
+use super::{assert_is_unique_uid, serialize::serialize_vcard_with_props};
 use crate::{
     DavError, DavErrorCondition, DavMethod,
     common::{
@@ -153,13 +153,13 @@ impl CardUpdateRequestHandler for Server {
                 Err(DavError::Code(StatusCode::PRECONDITION_FAILED))
                     if headers.ret == Return::Representation =>
                 {
-                    let mut vcard = String::with_capacity(128);
-                    let _ = card.inner.card.write_to(
-                        &mut vcard,
+                    let vcard = serialize_vcard_with_props(
+                        &card.inner.card,
+                        &[],
                         headers
                             .vcard_version
                             .unwrap_or(self.core.groupware.vcard_version),
-                    );
+                    )?;
 
                     return Ok(HttpResponse::new(StatusCode::PRECONDITION_FAILED)
                         .with_content_type("text/vcard; charset=utf-8")

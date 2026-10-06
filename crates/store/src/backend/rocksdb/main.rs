@@ -98,6 +98,7 @@ impl RocksDbStore {
             (SUBSPACE_REGISTRY_IDX, CfProfile::Scan),
             (SUBSPACE_REGISTRY_PK, CfProfile::PointLookup),
             (SUBSPACE_DIRECTORY, CfProfile::PointLookup),
+            (SUBSPACE_FOG_GMAIL_WATCH, CfProfile::PointLookup),
             (LEGACY_SUBSPACE_BITMAP_TEXT, CfProfile::Scan),
             (LEGACY_SUBSPACE_BITMAP_TAG, CfProfile::Scan),
         ] {

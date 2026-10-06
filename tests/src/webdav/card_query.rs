@@ -9,6 +9,7 @@ use crate::utils::server::TestServer;
 use dav_proto::schema::property::{CardDavProperty, DavProperty, WebDavProperty};
 use groupware::DavResourceName;
 use hyper::StatusCode;
+use registry::schema::{enums::VCardVersion, prelude::Property, structs::AddressBook};
 
 pub async fn test(test: &TestServer) {
     println!("Running REPORT addressbook-query tests...");
@@ -141,9 +142,75 @@ END:VCARD
         )
         .with_href_count(3);
 
+    // The native default selects v3, while Fog's serializer removes
+    // JSContact-only parameters from all CardDAV representations.
+    let admin = test.account("admin@example.com");
+    admin
+        .registry_update_setting(
+            AddressBook {
+                v_card_version: VCardVersion::V3,
+                ..Default::default()
+            },
+            &[Property::VCardVersion],
+        )
+        .await;
+    admin.reload_settings().await;
+
+    let v3_path = format!("{default_path}fog-v3.vcf");
+    let v3_input = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:fog-v3\r\nFN:David Peek\r\nN;JSCOMPS=\";1;0\";PROP-ID=name:Peek;David;;;\r\nNOTE:Numero Uno\r\nEND:VCARD\r\n";
+    client
+        .request("PUT", &v3_path, v3_input)
+        .await
+        .with_status(StatusCode::CREATED);
+
+    let get = client
+        .request("GET", &v3_path, "")
+        .await
+        .with_status(StatusCode::OK);
+    assert_v3_clean(get.expect_body());
+
+    let report = client
+        .request("REPORT", &default_path, QUERY_V3)
+        .await
+        .with_status(StatusCode::MULTI_STATUS);
+    assert_v3_clean(report.expect_body());
+
+    let conflict = client
+        .request_with_headers(
+            "PUT",
+            &v3_path,
+            [
+                ("content-type", "text/vcard; charset=utf-8"),
+                ("if", "([\"stale-etag\"])"),
+                ("prefer", "return=representation"),
+            ],
+            v3_input,
+        )
+        .await
+        .with_status(StatusCode::PRECONDITION_FAILED);
+    assert_v3_clean(conflict.expect_body());
+
+    admin
+        .registry_update_setting(AddressBook::default(), &[Property::VCardVersion])
+        .await;
+    admin.reload_settings().await;
+
     client.delete_default_containers().await;
     test.assert_is_empty().await;
 }
+
+fn assert_v3_clean(body: &str) {
+    assert!(body.contains("VERSION:3.0"), "{body}");
+    assert!(body.contains("Numero Uno"), "{body}");
+    assert!(!body.contains("JSCOMPS"), "{body}");
+    assert!(!body.contains("PROP-ID"), "{body}");
+}
+
+const QUERY_V3: &str = r#"<?xml version="1.0" encoding="utf-8" ?>
+<C:addressbook-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav">
+  <D:prop><C:address-data/></D:prop>
+  <C:filter><C:prop-filter name="UID"><C:text-match>fog-v3</C:text-match></C:prop-filter></C:filter>
+</C:addressbook-query>"#;
 
 const QUERY1: &str = r#"<?xml version="1.0" encoding="utf-8" ?>
    <C:addressbook-query xmlns:D="DAV:"

@@ -117,6 +117,7 @@ impl PostgresStore {
             SUBSPACE_LOGS,
             SUBSPACE_BLOBS,
             SUBSPACE_DIRECTORY,
+            SUBSPACE_FOG_GMAIL_WATCH,
             SUBSPACE_TELEMETRY_SPAN,
             SUBSPACE_TELEMETRY_METRIC,
         ] {

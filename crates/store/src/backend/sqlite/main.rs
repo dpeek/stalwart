@@ -81,6 +81,7 @@ impl SqliteStore {
             SUBSPACE_TELEMETRY_METRIC,
             SUBSPACE_SEARCH_INDEX,
             SUBSPACE_DIRECTORY,
+            SUBSPACE_FOG_GMAIL_WATCH,
         ] {
             let table = char::from(table);
             conn.execute(

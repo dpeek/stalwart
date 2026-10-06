@@ -8,7 +8,11 @@
 
 pub mod api;
 pub mod auth;
+mod calendar;
+mod fog;
 pub mod form;
+pub mod gmail;
+pub mod people;
 pub mod request;
 
 use common::Inner;

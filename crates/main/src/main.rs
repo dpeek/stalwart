@@ -85,6 +85,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     // Spawn servers
+    http::gmail::watch::spawn_dispatcher(init.inner.clone());
     let (shutdown_tx, shutdown_rx) = init.servers.spawn(|server, acceptor, shutdown_rx| {
         match &server.protocol {
             ServerProtocol::Smtp | ServerProtocol::Lmtp => server.spawn(

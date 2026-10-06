@@ -16,13 +16,19 @@ static GLOBAL: Jemalloc = Jemalloc;
 #[cfg(test)]
 pub mod automation;
 #[cfg(test)]
+pub mod calendar;
+#[cfg(test)]
 pub mod cluster;
 #[cfg(test)]
 pub mod directory;
 #[cfg(test)]
+pub mod gmail;
+#[cfg(test)]
 pub mod imap;
 #[cfg(test)]
 pub mod jmap;
+#[cfg(test)]
+pub mod people;
 #[cfg(test)]
 pub mod scim;
 #[cfg(test)]

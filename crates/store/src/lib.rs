@@ -124,6 +124,8 @@ pub const SUBSPACE_TELEMETRY_METRIC: u8 = b'x';
 pub const SUBSPACE_SEARCH_INDEX: u8 = b'z';
 pub const SUBSPACE_DELETED_ITEMS: u8 = b'j';
 pub const SUBSPACE_SPAM_SAMPLES: u8 = b'w';
+// Fog's Gmail-compatible push registrations. The email change log remains the sync state.
+pub const SUBSPACE_FOG_GMAIL_WATCH: u8 = b'G';
 
 // TODO: Remove in v1.0
 pub const LEGACY_SUBSPACE_BITMAP_TEXT: u8 = b'v';

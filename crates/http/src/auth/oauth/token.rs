@@ -243,7 +243,7 @@ impl TokenHandler for Server {
                             "",
                             issuer,
                             None,
-                            None,
+                            token_info.claims,
                             token_info.expires_in
                                 <= self.core.oauth.oauth_expiry_refresh_token_renew,
                             false,
@@ -327,7 +327,7 @@ impl TokenHandler for Server {
                     account_id,
                     account_name,
                     self.core.oauth.oauth_expiry_token,
-                    None,
+                    scope.as_deref(),
                     credential_version.into(),
                 )
                 .await?,
@@ -339,7 +339,7 @@ impl TokenHandler for Server {
                     account_id,
                     account_name,
                     self.core.oauth.oauth_expiry_refresh_token,
-                    None,
+                    scope.as_deref(),
                     credential_version.into(),
                 )
                 .await?

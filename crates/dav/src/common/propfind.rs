@@ -17,8 +17,8 @@ use crate::{
         query::{CalendarQueryHandler, try_parse_tz},
     },
     card::{
-        CARD_CONTAINER_PROPS, CARD_ITEM_PROPS,
-        query::{serialize_vcard_with_props, vcard_query},
+        CARD_CONTAINER_PROPS, CARD_ITEM_PROPS, query::vcard_query,
+        serialize::serialize_vcard_with_props,
     },
     common::{DavQueryResource, acl::current_user_privilege_set, uri::DavUriResource},
     file::{FILE_CONTAINER_PROPS, FILE_ITEM_PROPS},
@@ -864,7 +864,7 @@ impl PropFindRequestHandler for Server {
                                     (*version)
                                         .or(query.vcard_version)
                                         .unwrap_or(self.core.groupware.vcard_version),
-                                )),
+                                )?),
                             ));
                         }
                         _ => {

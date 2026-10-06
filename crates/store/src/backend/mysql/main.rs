@@ -95,6 +95,7 @@ impl MysqlStore {
             SUBSPACE_REGISTRY,
             SUBSPACE_REGISTRY_PK,
             SUBSPACE_DIRECTORY,
+            SUBSPACE_FOG_GMAIL_WATCH,
             SUBSPACE_QUEUE_MESSAGE,
             SUBSPACE_QUEUE_EVENT,
             SUBSPACE_REPORT_OUT,

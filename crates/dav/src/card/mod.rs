@@ -20,6 +20,7 @@ pub mod get;
 pub mod mkcol;
 pub mod proppatch;
 pub mod query;
+pub mod serialize;
 pub mod update;
 
 pub(crate) static CARD_CONTAINER_PROPS: [DavProperty; 23] = [

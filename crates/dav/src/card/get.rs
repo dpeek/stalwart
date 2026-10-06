@@ -6,6 +6,7 @@
 
 use crate::{
     DavError, DavMethod,
+    card::serialize::serialize_vcard_with_props,
     common::{
         ETag,
         lock::{LockRequestHandler, ResourceState},
@@ -117,13 +118,13 @@ impl CardGetRequestHandler for Server {
             .with_etag(etag)
             .with_last_modified(Rfc1123DateTime::new(i64::from(card.modified)).to_string());
 
-        let mut vcard = String::with_capacity(128);
-        let _ = card.card.write_to(
-            &mut vcard,
+        let vcard = serialize_vcard_with_props(
+            &card.card,
+            &[],
             headers
                 .vcard_version
                 .unwrap_or(self.core.groupware.vcard_version),
-        );
+        )?;
 
         if !is_head {
             Ok(response.with_binary_body(vcard))

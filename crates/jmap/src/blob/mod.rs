@@ -16,7 +16,7 @@ pub struct UploadResponse {
     #[serde(rename(serialize = "accountId"))]
     account_id: Id,
     #[serde(rename(serialize = "blobId"))]
-    blob_id: BlobId,
+    pub blob_id: BlobId,
     #[serde(rename(serialize = "type"))]
     c_type: String,
     size: usize,
